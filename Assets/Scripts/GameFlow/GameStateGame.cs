@@ -1,5 +1,7 @@
 // Game State Game
 
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class GameStateGame : GameState
@@ -20,11 +22,13 @@ public class GameStateGame : GameState
         boardComponent = FindObjectOfType<Board>();
 
         ClearBoard();
+
         // Test Data
         board[0, 1] = board[2, 1] = 1;
-
         boardComponent.UpdateBoard(0, 1);
         boardComponent.UpdateBoard(2, 1);
+
+        boardComponent.ResetPlayer();
     }
 
 
@@ -32,6 +36,7 @@ public class GameStateGame : GameState
     {
         gameUI.SetActive(false);
     }
+
 
     private void ClearBoard()
     {
@@ -42,21 +47,21 @@ public class GameStateGame : GameState
             }
     }
 
+
     public void PutGemInBoard(int x, int y)
     {
         board[x, y] = 1;
     }
 
 
-    public int[,] ReturnBoard()
+    public void DeleteGemInBoard(int x, int y)
     {
-        return board;
+        board[x, y] = 0;
     }
+
 
     public void CheckBoard()
     {
-
-
         for (int y = 0; y < board.GetLength(1); y++)
         {
             int checkResult = 0;
@@ -68,14 +73,32 @@ public class GameStateGame : GameState
 
             if (checkResult == winScore)
             {
-                // state = GetComponent<GameStateWin>();
-                Debug.Log("W I N");
+                DestroyGems(y);
+                StartCoroutine(StartWinPanel());
+                
                 return;
             }
         }
 
-        Debug.Log("FAIL ");
-        // state = GetComponent<GameStateFail>();
+        boardComponent.DestroyAll();
+        brain.ChangeState(GetComponent<GameStateLose>());
     }
 
+
+    IEnumerator StartWinPanel()
+    {
+        yield return new WaitForSeconds(1f);
+
+        brain.ChangeState(GetComponent<GameStateWin>());
+    }
+
+
+    private void DestroyGems(int y)
+    {
+        for (int x = 0; x < board.GetLength(0); x++)
+        {
+            DeleteGemInBoard(x, y);
+            boardComponent.DestroyGem(x, y);
+        }
+    }
 }

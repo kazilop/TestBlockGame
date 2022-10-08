@@ -4,7 +4,6 @@ using UnityEngine.EventSystems;
 
 public class GemSlot : MonoBehaviour, IDropHandler
 {
-
     public static GemSlot gemSlot;
 
     private GameStateGame gameStateGame;
@@ -13,6 +12,8 @@ public class GemSlot : MonoBehaviour, IDropHandler
     {
         gameStateGame = FindObjectOfType<GameStateGame>();
     }
+
+
     public void OnDrop(PointerEventData eventData)
     {
         var item = Block.block;
@@ -27,7 +28,6 @@ public class GemSlot : MonoBehaviour, IDropHandler
                 int x = Convert.ToInt32(tileName.Substring(5).Remove(1));
                 int y = Convert.ToInt32(tileName.Substring(6));
 
-                print(x + " " + y);
                 gameStateGame.PutGemInBoard(x, y);
                 gameStateGame.CheckBoard();
             }
